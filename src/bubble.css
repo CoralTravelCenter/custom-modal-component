@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+.coral-promo-bubble {
+	font-family: "Manrope", serif;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 7px 16px 7px 8px;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 40px;
+	width: fit-content;
+	cursor: pointer;
+	flex-shrink: 0;
+	order: 1;
+	transition: border-color 0.3s ease;
+}
+
+.coral-promo-bubble:hover {
+	border-color: #66D1FF;
+}
+
+.coral-promo-bubble__icon {
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #e84f0d;
+	border-radius: 100%;
+	color: #fff;
+}
+
+.coral-promo-bubble__text > p {
+	margin: 0;
+	line-height: 1;
+	font-weight: 600;
+	font-size: 12px;
+}

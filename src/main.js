@@ -1,3 +1,5 @@
+import Cookies from 'js-cookie';
+
 const isBrowserNotSupportDialog = window.HTMLDialogElement === undefined;
 
 if (isBrowserNotSupportDialog) {
@@ -6,24 +8,29 @@ if (isBrowserNotSupportDialog) {
 	polyfill.registerDialog(dialogElement);
 }
 
+function setCookieForToday(cookieName, value) {
+	const now = new Date();
+	const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0); // Конец текущего дня
+	const remainingTime = (endOfDay - now) / (1000 * 60 * 60 * 24); // Оставшееся время до конца дня в долях дня
+
+	// Устанавливаем куку с истечением в долях дня
+	Cookies.set(cookieName, value, {expires: remainingTime});
+}
+
 export default class CoralPopup {
-	constructor(eventName = "renderModal") {
+	constructor(settings) {
 		this.dialog = this.createDialog();
 		this.wrapper = this.createWrapper();
 		this.poster = this.createElement("div", "coral-popup__poster");
 		this.content = this.createElement("div", "coral-popup__content");
-
+		this.settings = settings;
 		this.wrapper.append(this.poster, this.content);
 		this.dialog.append(this.wrapper);
 		document.body.append(this.dialog);
-
-		this.eventName = eventName;
-		this.addCustomEvent();
 	}
 
 	createDialog() {
 		const dialog = document.createElement("dialog");
-		dialog.id = "coral-popup";
 		dialog.classList.add("coral-popup");
 		dialog.setAttribute("aria-labelledby", "popup-headline");
 		dialog.setAttribute("aria-describedby", "popup-text");
@@ -40,12 +47,6 @@ export default class CoralPopup {
 		const element = document.createElement(tag);
 		element.classList.add(className);
 		return element;
-	}
-
-	addCustomEvent() {
-		document.addEventListener(this.eventName, (event) => {
-			this.show(event.detail);
-		});
 	}
 
 	createCloseButton() {
@@ -156,28 +157,26 @@ export default class CoralPopup {
 		}
 	}
 
-	show(data) {
-		console.log(data)
+	show() {
 		this.createCloseButton();
-		this.createPoster(data.poster, data.erid);
-		this.createHeadline(data.headline);
-		this.createUnderline(data.slogan);
-		this.createText(data.underline);
-		this.createActionButton(data.action);
+		this.createPoster(this.settings.poster, this.settings.erid);
+		this.createHeadline(this.settings.headline);
+		this.createUnderline(this.settings.slogan);
+		this.createText(this.settings.underline);
+		this.createActionButton(this.settings.action);
 		this.createCollapse();
-		this.createConditions(data.conditions);
-		this.createAttention(data.attention);
+		this.createConditions(this.settings.conditions);
+		this.createAttention(this.settings.attention);
 
 		this.dialog.showModal();
 		this.wrapper.classList.add("coral-popup__wrapper--active");
 
 		this.bindGlobalEvents();
-		if (data.expirationTime !== '') {
-			this.checkExpirationDate(data.expirationTime);
+		if (this.settings.expirationTime !== '') {
+			this.checkExpirationDate(this.settings.expirationTime);
 		}
-		if (data.triggeredBy !== '') {
-			this.show()
-		}
+
+		setCookieForToday('_show_once_per_day', true)
 	}
 
 	close() {
@@ -186,7 +185,8 @@ export default class CoralPopup {
 			"transitionend",
 			() => {
 				this.dialog.close();
-				this.dialog.remove();
+				this.content.innerHTML = ""; // Очищаем содержимое
+				this.poster.innerHTML = ""; // Очищаем постер
 			},
 			{once: true}
 		);

@@ -1,4 +1,6 @@
 import CoralPopup from './main.js';
+import PromoBubble from "./bubble.js";
+import Cookies from 'js-cookie';
 
 window._popUpManager = {
 	headline: "Только сейчас:",
@@ -15,7 +17,7 @@ window._popUpManager = {
 	conditions: [
 		"Направления: любые",
 		"Даты начала путешествия: любые",
-		"Сроки действия акции: с 24.01.2025 г. по 27.01.2025 г."
+		"Сроки действия акции:\n с 24.01.2025 г. по 27.01.2025 г."
 	],
 	attention: [
 		"* Акция не суммируется с другими акциями Coral Travel<br>",
@@ -23,16 +25,19 @@ window._popUpManager = {
 		"*** Акция распространяется только на новые неоплаченные бронирования пакетных туров или отелей."
 	],
 	expirationTime: '',
-
+	showOncePerDay: true,
 	//	Настройка, для страницы акций - чтобы открыть попап по клику на баннер
 	triggeredBy: '#promo-name'
 }
 
-const modal = new CoralPopup()
-document.querySelector('.coral-popup-trigger button').addEventListener('click', () => modal.show())
-document.dispatchEvent(
-	new CustomEvent("renderModal", {
-		detail: window._popUpManager
-	})
-);
+const promoBubble = new PromoBubble(window._popUpManager); // Рендеринг бабла
+const modal = new CoralPopup(window._popUpManager); // Создание попапа
+if (!Cookies.get('_show_once_per_day')) modal.show()
+// Добавляем слушатель на пузырёк
+const bubble = document.querySelector('.coral-promo-bubble'); // Находим элемент
+bubble.addEventListener('click', () => {
+	modal.show(); // Открываем попап при клике
+});
+
+
 
